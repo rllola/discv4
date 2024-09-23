@@ -10,7 +10,7 @@ use primitive_types::H256;
 use rand::{distributions::Standard, prelude::SliceRandom, thread_rng, Rng};
 use rlp::{Rlp, RlpStream};
 use secp256k1::{
-    recovery::{RecoverableSignature, RecoveryId},
+    ecdsa::{RecoverableSignature, RecoveryId},
     Message, PublicKey, SecretKey, SECP256K1,
 };
 use sha3::{Digest, Keccak256};
@@ -332,8 +332,8 @@ impl Node {
                             }
                         }
 
-                        let signature: RecoverableSignature = SECP256K1.sign_recoverable(
-                            &Message::from_slice(&Keccak256::digest(&payload)).unwrap(),
+                        let signature: RecoverableSignature = SECP256K1.sign_ecdsa_recoverable(
+                            &Message::from_digest_slice(&Keccak256::digest(&payload).as_slice()).unwrap(),
                             &secret_key,
                         );
 
@@ -449,7 +449,7 @@ impl Node {
                                 let rec_sig =
                                     RecoverableSignature::from_compact(&buf[32..96], rec_id)?;
                                 let public_key =
-                                    SECP256K1.recover(&keccak256_message(&buf[97..]), &rec_sig)?;
+                                    SECP256K1.recover_ecdsa(&keccak256_message(&buf[97..]), &rec_sig)?;
                                 let remote_id = pk2id(&public_key);
 
                                 if remote_id == id {

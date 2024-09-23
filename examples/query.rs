@@ -30,7 +30,7 @@ async fn main() {
 
     let node = Node::new(
         format!("0.0.0.0:{}", port).parse().unwrap(),
-        SecretKey::new(&mut secp256k1::rand::thread_rng()),
+        SecretKey::new(&mut rand::thread_rng()),
         BOOTSTRAP_NODES.iter().map(|v| v.parse().unwrap()).collect(),
         None,
         true,
